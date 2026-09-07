@@ -104,6 +104,19 @@ make test                      # SQL tests that need no network
 ./test/http/run_mock_tests.sh  # protocol tests against a local mock RWS
 ```
 
+## Formatting
+
+DuckDB's formatter pins clang-format to 11.x, which is far older than the one
+a current toolchain ships. Keep it in a venv rather than on the system:
+
+```bash
+python3 -m venv .venv-format
+.venv-format/bin/pip install "clang_format==11.0.1" "black>=24" cmake-format
+PATH="$PWD/.venv-format/bin:$PATH" make format-fix
+```
+
+`make format-check` is what CI runs (`format_checks: 'format;tidy'`).
+
 ## Install elsewhere
 
 `docs/INSTALL.md` covers installing the built extension into another DuckDB.

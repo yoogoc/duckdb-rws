@@ -105,8 +105,8 @@ void LoadInternal(ExtensionLoader &loader) {
 	TableFunction clear_cache("rws_clear_cache", {}, ClearCacheScan, ClearCacheBind, ClearCacheInit);
 	loader.RegisterFunction(clear_cache);
 
-	TableFunction refresh_catalog("rws_refresh_catalog", {LogicalType::VARCHAR}, RefreshCatalogScan,
-	                              RefreshCatalogBind, ClearCacheInit);
+	TableFunction refresh_catalog("rws_refresh_catalog", {LogicalType::VARCHAR}, RefreshCatalogScan, RefreshCatalogBind,
+	                              ClearCacheInit);
 	loader.RegisterFunction(refresh_catalog);
 
 	loader.SetDescription("Read Medidata Rave Web Services studies as DuckDB tables");

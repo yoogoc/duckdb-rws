@@ -6,8 +6,7 @@
 
 namespace duckdb {
 
-XmlReader::XmlReader(const char *data, idx_t size, string source)
-    : data(data), size(size), source(std::move(source)) {
+XmlReader::XmlReader(const char *data, idx_t size, string source) : data(data), size(size), source(std::move(source)) {
 	// Tolerate a UTF-8 BOM: RWS emits one on most endpoints.
 	if (size >= 3 && static_cast<unsigned char>(data[0]) == 0xEF && static_cast<unsigned char>(data[1]) == 0xBB &&
 	    static_cast<unsigned char>(data[2]) == 0xBF) {

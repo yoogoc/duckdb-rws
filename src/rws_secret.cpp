@@ -21,8 +21,8 @@ static string NormalizeBaseUrl(const string &raw) {
 	// Credentials embedded in the URL would leak through error messages and logs.
 	auto authority_start = url.find("://") + 3;
 	auto authority_end = url.find('/', authority_start);
-	auto authority = url.substr(authority_start, authority_end == string::npos ? string::npos
-	                                                                           : authority_end - authority_start);
+	auto authority =
+	    url.substr(authority_start, authority_end == string::npos ? string::npos : authority_end - authority_start);
 	if (authority.find('@') != string::npos) {
 		throw InvalidInputException("rws secret: BASE_URL must not embed credentials, use USERNAME/PASSWORD");
 	}
@@ -103,10 +103,9 @@ RWSConnection RWSGetConnection(ClientContext &context, const string &secret_name
 			entry = std::move(match.secret_entry);
 		}
 		if (!entry) {
-			throw InvalidInputException(
-			    "no 'rws' secret found. Create one with:\n"
-			    "  CREATE SECRET (TYPE rws, BASE_URL 'https://host/RaveWebServices', "
-			    "USERNAME '...', PASSWORD '...');");
+			throw InvalidInputException("no 'rws' secret found. Create one with:\n"
+			                            "  CREATE SECRET (TYPE rws, BASE_URL 'https://host/RaveWebServices', "
+			                            "USERNAME '...', PASSWORD '...');");
 		}
 	} else {
 		entry = secret_manager.GetSecretByName(transaction, secret_name);

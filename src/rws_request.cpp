@@ -104,8 +104,8 @@ void ValidateStart(const string &start) {
 		}
 		return true;
 	};
-	bool valid = is_digits(0, 4) && start.size() > 9 && start[4] == '-' && is_digits(5, 2) && start[7] == '-' &&
-	             is_digits(8, 2);
+	bool valid =
+	    is_digits(0, 4) && start.size() > 9 && start[4] == '-' && is_digits(5, 2) && start[7] == '-' && is_digits(8, 2);
 	if (valid && start.size() > 10) {
 		valid = start[10] == 'T' && is_digits(11, 2) && start.size() > 15 && start[13] == ':' && is_digits(14, 2);
 		if (valid && start.size() > 16) {
@@ -260,17 +260,10 @@ string PreferredColumnName(const string &item_oid, const string &form_oid) {
 	return item_oid;
 }
 
-const char *const FORM_CONTEXT_COLUMNS[] = {"record_id",
-                                            "study_oid",
-                                            "metadata_version_oid",
-                                            "subject_key",
-                                            "site_oid",
-                                            "study_event_oid",
-                                            "study_event_repeat_key",
-                                            "form_oid",
-                                            "form_repeat_key",
-                                            "item_group_oid",
-                                            "item_group_repeat_key"};
+const char *const FORM_CONTEXT_COLUMNS[] = {
+    "record_id",       "study_oid",       "metadata_version_oid",   "subject_key",
+    "site_oid",        "study_event_oid", "study_event_repeat_key", "form_oid",
+    "form_repeat_key", "item_group_oid",  "item_group_repeat_key"};
 constexpr idx_t FORM_CONTEXT_COLUMN_COUNT = sizeof(FORM_CONTEXT_COLUMNS) / sizeof(FORM_CONTEXT_COLUMNS[0]);
 
 //! Resolves the wide-table column layout of one form. `names`/`types` receive
@@ -297,10 +290,9 @@ void BuildFormColumns(const RWSFormShape &shape, vector<string> &names, vector<L
 const RWSFormShape &GetFormShape(const RWSDataset &dataset, const string &form_oid) {
 	auto entry = dataset.forms.find(form_oid);
 	if (entry == dataset.forms.end()) {
-		throw InvalidInputException(
-		    "rws: form '%s' has no data in study '%s' (dataset '%s'). Forms present: %s", form_oid, dataset.study_oid,
-		    dataset.dataset_type,
-		    dataset.form_oids.empty() ? "none" : StringUtil::Join(dataset.form_oids, ", "));
+		throw InvalidInputException("rws: form '%s' has no data in study '%s' (dataset '%s'). Forms present: %s",
+		                            form_oid, dataset.study_oid, dataset.dataset_type,
+		                            dataset.form_oids.empty() ? "none" : StringUtil::Join(dataset.form_oids, ", "));
 	}
 	return entry->second;
 }
@@ -323,8 +315,8 @@ string RWSRequestSpec::CacheKey(const RWSConnection &connection) const {
 }
 
 const vector<string> &RWSMasterTableNames() {
-	static const vector<string> names = {"studies", "subjects",       "sites",     "forms",
-	                                     "items",   "study_events",   "clinical_items", "form_columns"};
+	static const vector<string> names = {"studies", "subjects",     "sites",          "forms",
+	                                     "items",   "study_events", "clinical_items", "form_columns"};
 	return names;
 }
 
@@ -619,8 +611,7 @@ shared_ptr<RWSResult> RWSBuildResult(ClientContext &context, const RWSConnection
 				forms.emplace_back(form_oid);
 			}
 			result->rows.push_back({Value(dataset->study_oid), Value(event_oid),
-			                        Value::LIST(LogicalType::VARCHAR, std::move(forms)),
-			                        Value::BIGINT(entry.second)});
+			                        Value::LIST(LogicalType::VARCHAR, std::move(forms)), Value::BIGINT(entry.second)});
 		}
 		break;
 	}
@@ -718,8 +709,7 @@ shared_ptr<RWSResult> RWSBuildResult(ClientContext &context, const RWSConnection
 				     Context(record.study_event_oid), Context(record.study_event_repeat_key), Context(record.form_oid),
 				     Context(record.form_repeat_key), Context(record.item_group_oid),
 				     Context(record.item_group_repeat_key), Context(item.item_oid),
-				     VarcharOrNull(item.value, item.has_value),
-				     BooleanOrNull(item.is_null_known, item.is_null),
+				     VarcharOrNull(item.value, item.has_value), BooleanOrNull(item.is_null_known, item.is_null),
 				     VarcharOrNull(record.subject_transaction_type, !record.subject_transaction_type.empty()),
 				     VarcharOrNull(record.study_event_transaction_type, !record.study_event_transaction_type.empty()),
 				     VarcharOrNull(record.form_transaction_type, !record.form_transaction_type.empty()),

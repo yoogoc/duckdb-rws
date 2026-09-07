@@ -447,11 +447,10 @@ shared_ptr<RWSResult> RWSCatalog::BuildTablesTable(ClientContext &context) {
 		schema.Scan(CatalogType::TABLE_ENTRY, [&](CatalogEntry &entry) {
 			auto &table = entry.Cast<RWSTableEntry>();
 			auto &spec = table.GetSpec();
-			result->rows.push_back(
-			    {Value(schema.name), Value(table.name),
-			     spec.study_oid.empty() ? Value(LogicalType::VARCHAR) : Value(spec.study_oid),
-			     spec.form_oid.empty() ? Value(LogicalType::VARCHAR) : Value(spec.form_oid),
-			     Value::BIGINT(NumericCast<int64_t>(table.GetColumns().LogicalColumnCount()))});
+			result->rows.push_back({Value(schema.name), Value(table.name),
+			                        spec.study_oid.empty() ? Value(LogicalType::VARCHAR) : Value(spec.study_oid),
+			                        spec.form_oid.empty() ? Value(LogicalType::VARCHAR) : Value(spec.form_oid),
+			                        Value::BIGINT(NumericCast<int64_t>(table.GetColumns().LogicalColumnCount()))});
 		});
 	}
 	return result;

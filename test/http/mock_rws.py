@@ -6,6 +6,7 @@ error handling without credentials or a network: authentication, ODM documents
 with unusual-but-legal XML, RWS business errors returned under HTTP 200, and
 transient failures that must be retried.
 """
+
 import sys
 import threading
 from base64 import b64encode
@@ -25,7 +26,8 @@ ODM_OPEN = (
 # Deliberately awkward: a UTF-8 BOM, comments, a CDATA section, entity
 # references and a non-default namespace prefix for the ODM namespace itself.
 STUDIES = (
-    "﻿" + ODM_OPEN
+    "﻿"
+    + ODM_OPEN
     + "<!-- a comment -->"
     + '<Study OID="ACME &amp; Co(Prod)">'
     + "<GlobalVariables>"
@@ -88,9 +90,9 @@ DOCTYPE_ATTACK = (
 
 TRUNCATED = ODM_OPEN + '<ClinicalData StudyOID="x"><SubjectData SubjectKey="S-1">'
 
-NOT_FOUND = BUSINESS_ERROR.replace(
-    "You do not have access to this study.", "RWS URL does not exist").replace(
-    "RWS00024", "RWS00055")
+NOT_FOUND = BUSINESS_ERROR.replace("You do not have access to this study.", "RWS URL does not exist").replace(
+    "RWS00024", "RWS00055"
+)
 
 KNOWN_STUDIES = {
     "ACME & Co(Prod)",
@@ -122,15 +124,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.headers.get("Authorization") != EXPECTED_AUTH:
-            self.reply(401, BUSINESS_ERROR.replace(
-                "You do not have access to this study.", "Invalid user name or password."))
+            self.reply(
+                401, BUSINESS_ERROR.replace("You do not have access to this study.", "Invalid user name or password.")
+            )
             return
 
         base = "/RaveWebServices/"
         if not self.path.startswith(base):
             self.reply(404, "<html>not found</html>", "text/html")
             return
-        route = self.path[len(base):]
+        route = self.path[len(base) :]
 
         if route == "version":
             self.reply(200, "1.16.0", "text/plain")
@@ -145,7 +148,7 @@ class Handler(BaseHTTPRequestHandler):
         # Everything below is scoped to a study. The study OID selects which
         # failure mode to exercise, so that each one is reached through the
         # ordinary code path rather than through a special parameter.
-        rest = route[len("studies/"):]
+        rest = route[len("studies/") :]
         study, _, tail = rest.partition("/")
         study = unquote(study)
         tail = tail.split("?", 1)[0]
