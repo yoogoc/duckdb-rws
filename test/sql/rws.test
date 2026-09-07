@@ -1,0 +1,86 @@
+# name: test/sql/rws.test
+# description: rws extension surface that needs no network access
+# group: [sql]
+
+statement error
+SELECT * FROM rws_studies();
+----
+Catalog Error
+
+require rws
+
+# Every table function needs a secret before it will touch the network.
+statement error
+SELECT * FROM rws_studies();
+----
+no 'rws' secret found
+
+statement error
+CREATE SECRET bad_scheme (TYPE rws, BASE_URL 'ftp://example.com');
+----
+BASE_URL must start with
+
+statement error
+CREATE SECRET embedded_credentials (TYPE rws, BASE_URL 'https://user:pw@example.com/RaveWebServices');
+----
+must not embed credentials
+
+statement ok
+CREATE SECRET rave (
+    TYPE rws,
+    BASE_URL 'https://example.invalid',
+    USERNAME 'user',
+    PASSWORD 'secret'
+);
+
+# The service root is appended when the base URL is given as a bare host.
+query I
+SELECT secret_string LIKE '%base_url=https://example.invalid/RaveWebServices%' FROM duckdb_secrets() WHERE name = 'rave';
+----
+true
+
+# The password must never be rendered back out.
+query I
+SELECT secret_string LIKE '%secret%' FROM duckdb_secrets() WHERE name = 'rave';
+----
+false
+
+statement error
+SELECT * FROM rws_subjects('STUDY', 'Prod', include = 'bogus');
+----
+include must be
+
+statement error
+SELECT * FROM rws_form('STUDY', 'Prod', 'VITAL', dataset_type = 'weird');
+----
+dataset_type must be
+
+statement error
+SELECT * FROM rws_clinical_items('STUDY', 'Prod', start = 'yesterday');
+----
+must be an ISO 8601 timestamp
+
+statement error
+SELECT * FROM rws_subjects('STUDY', 'Prod', subject_key_type = 'Whatever');
+----
+subject_key_type must be
+
+statement error
+SELECT * FROM rws_subjects('', 'Prod');
+----
+must not be empty
+
+statement error
+ATTACH '' AS bad (TYPE rws, SECRET rave, DATASET_TYPE 'weird');
+----
+DATASET_TYPE must be
+
+statement error
+ATTACH 'A/B/C' AS bad (TYPE rws, SECRET rave);
+----
+PROJECT/ENVIRONMENT
+
+query I
+SELECT removed_entries >= 0 FROM rws_clear_cache();
+----
+true
